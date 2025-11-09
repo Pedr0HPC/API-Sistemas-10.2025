@@ -1,15 +1,12 @@
-// repositories/UserRepository.js
-const pool = require("../db"); // Importa o pool de conexão do PostgreSQL
+const pool = require("../db"); // Importa a conexão do PostgreSQL
 
 class UserRepository {
   constructor() {
     console.log("UserRepository (PostgreSQL) inicializado.");
   }
 
-  // --- Métodos precisam ser 'async' para usar 'await' ---
-
   async getAll() {
-    // Busca todos os usuários na tabela 'users'
+    // Busca todos os usuários na tabela 'users' (Criada pelo Index.js)
     const { rows } = await pool.query("SELECT * FROM users ORDER BY id ASC");
     return rows;
   }

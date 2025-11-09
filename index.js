@@ -18,8 +18,6 @@ app.listen(port, () => {
  console.log(`Servidor rodando na porta ${port}`);
 });
 
-// index.js (COLE ISSO NO LUGAR DO BLOCO ACIMA)
-
 const pool = require("./db");
 
 // Comando SQL para criar a tabela (IF NOT EXISTS não dá erro se já existir)
@@ -42,7 +40,7 @@ pool.query(createTableQuery, (err, result) => {
 
   console.log("Tabela 'users' verificada ou criada com sucesso.");
 
-  // 2. Agora, testa a conexão (como antes)
+  // 2. Agora, testa a conexão
   pool.query("SELECT NOW()", (err, result) => {
     if (err) {
       console.error("Erro ao conectar ao banco:", err);
