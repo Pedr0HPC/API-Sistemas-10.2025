@@ -1,73 +1,87 @@
+// routes/users.js
 const express = require("express");
 const router = express.Router();
-
-// Importamos o repositório que agora gerencia nossos dados
 const userRepository = require("../repositories/UserRepository");
 
 // Listar todos os usuários
-router.get("/", (req, res) => {
-  const usuarios = userRepository.getAll();
-  res.json(usuarios);
+router.get("/", async (req, res) => {
+  try {
+    const usuarios = await userRepository.getAll();
+    res.json(usuarios);
+  } catch (err) {
+    res.status(500).json({ mensagem: err.message });
+  }
 });
 
 // Buscar usuário por ID
-router.get("/:id", (req, res) => {
-  const id = req.params.id;
-  const usuario = userRepository.getById(id);
+router.get("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const usuario = await userRepository.getById(id);
 
-  // Se o usuário não for encontrado, o repositório retorna 'undefined'
-  if (!usuario) {
-    return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    if (!usuario) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
+    res.json(usuario);
+  } catch (err) {
+    res.status(500).json({ mensagem: err.message });
   }
-
-  res.json(usuario);
 });
 
 // Criar novo usuário
-router.post("/", (req, res) => {
-  const novoUsuario = req.body;
+router.post("/", async (req, res) => {
+  try {
+    const novoUsuario = req.body;
+    if (!novoUsuario.nome || !novoUsuario.email) {
+      return res
+        .status(400)
+        .json({ mensagem: "Nome e email são obrigatórios" });
+    }
 
-  // Validação simples
-  if (!novoUsuario.nome || !novoUsuario.email) {
-    return res
-      .status(400)
-      .json({ mensagem: "Nome e email são obrigatórios" });
+    const usuarioCriado = await userRepository.create(novoUsuario);
+    res.status(201).json({
+      mensagem: "Usuário criado com sucesso",
+      usuario: usuarioCriado,
+    });
+  } catch (err) {
+    res.status(500).json({ mensagem: err.message });
   }
-
-  const usuarioCriado = userRepository.create(novoUsuario);
-  res.status(201).json({
-    mensagem: "Usuário criado com sucesso",
-    usuario: usuarioCriado,
-  });
 });
 
 // Atualizar usuário por ID
-router.put("/:id", (req, res) => {
-  const id = req.params.id;
-  const dadosAtualizados = req.body;
+router.put("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const dadosAtualizados = req.body;
+    const usuarioAtualizado = await userRepository.update(id, dadosAtualizados);
 
-  const usuarioAtualizado = userRepository.update(id, dadosAtualizados);
+    if (!usuarioAtualizado) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
 
-  if (!usuarioAtualizado) {
-    return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    res.json({
+      mensagem: `Usuário ${id} atualizado`,
+      usuario: usuarioAtualizado,
+    });
+  } catch (err) {
+    res.status(500).json({ mensagem: err.message });
   }
-
-  res.json({
-    mensagem: `Usuário ${id} atualizado`,
-    usuario: usuarioAtualizado,
-  });
 });
 
 // Excluir usuário
-router.delete("/:id", (req, res) => {
-  const id = req.params.id;
-  const sucesso = userRepository.delete(id);
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const sucesso = await userRepository.delete(id);
 
-  if (!sucesso) {
-    return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    if (!sucesso) {
+      return res.status(404).json({ mensagem: "Usuário não encontrado" });
+    }
+
+    res.json({ mensagem: `Usuário ${id} deletado com sucesso` });
+  } catch (err) {
+    res.status(500).json({ mensagem: err.message });
   }
-
-  res.json({ mensagem: `Usuário ${id} deletado com sucesso` });
 });
 
 module.exports = router;

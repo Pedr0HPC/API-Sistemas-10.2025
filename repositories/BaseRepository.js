@@ -1,6 +1,6 @@
 /**
- * Classe base (Pai) que implementa a lógica de CRUD genérica.
- * Ela gerencia uma lista de itens em memória, incluindo a geração de IDs.
+ * Classe base (Pai) que implementa a lógica de CRUD.
+ * Ela gerencia uma lista de itens em memória, incluindo a geração de IDs
  */
 class BaseRepository {
   constructor() {
